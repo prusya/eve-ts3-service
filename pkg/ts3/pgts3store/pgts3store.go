@@ -2,6 +2,7 @@ package pgts3store
 
 import (
 	"github.com/jmoiron/sqlx"
+
 	"github.com/prusya/eve-ts3-service/pkg/system"
 	"github.com/prusya/eve-ts3-service/pkg/ts3"
 )
@@ -50,7 +51,6 @@ func New(db *sqlx.DB) *Store {
 	s := Store{
 		db: db,
 	}
-	s.Init()
 
 	return &s
 }

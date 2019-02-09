@@ -10,6 +10,7 @@ func (s *Service) Routes() {
 	s.router.MethodNotAllowedHandler = http.HandlerFunc(MethodNotAllowedH)
 
 	jsonAPI := s.router.PathPrefix("/api").Subrouter()
+	jsonAPI.HandleFunc("/healthcheck", HealthcheckH)
 
 	// ts3 service routes.
 	ts3v1 := jsonAPI.PathPrefix("/ts3/v1").Subrouter()

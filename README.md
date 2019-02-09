@@ -1,7 +1,7 @@
 eve-ts3-service
 ---
 
-[![CircleCI](https://circleci.com/gh/prusya/eve-ts3-service.svg?style=shield)](https://circleci.com/gh/prusya/eve-ts3-service) [![Godoc](http://img.shields.io/badge/godoc-reference-blue.svg?style=flat)](https://godoc.org/github.com/prusya/eve-ts3-service) [![Maintainability](https://api.codeclimate.com/v1/badges/f09a61702b2518bcdfc5/maintainability)](https://codeclimate.com/github/prusya/eve-ts3-service/maintainability) [![license](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://raw.githubusercontent.com/prusya/eve-ts3-service/master/LICENSE)
+[![CircleCI](https://circleci.com/gh/prusya/eve-ts3-service.svg?style=shield)](https://circleci.com/gh/prusya/eve-ts3-service) [![Godoc](http://img.shields.io/badge/godoc-reference-blue.svg?style=flat)](https://godoc.org/github.com/prusya/eve-ts3-service) [![Maintainability](https://api.codeclimate.com/v1/badges/f09a61702b2518bcdfc5/maintainability)](https://codeclimate.com/github/prusya/eve-ts3-service/maintainability) [![codecov](https://codecov.io/gh/prusya/eve-ts3-service/branch/master/graph/badge.svg)](https://codecov.io/gh/prusya/eve-ts3-service) [![license](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://raw.githubusercontent.com/prusya/eve-ts3-service/master/LICENSE)
 
 Service to add/del ts3 users to/from server groups.
 

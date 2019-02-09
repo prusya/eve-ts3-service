@@ -71,6 +71,11 @@ func recoverPanic(w http.ResponseWriter) {
 	}
 }
 
+// HealthcheckH calls respondOK.
+func HealthcheckH(w http.ResponseWriter, r *http.Request) {
+	respondOK(w)
+}
+
 // CreateRegisterRecordH creates a new register record for ts3 service.
 func (s *Service) CreateRegisterRecordH(w http.ResponseWriter, r *http.Request) {
 	defer recoverPanic(w)

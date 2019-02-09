@@ -1,0 +1,12 @@
+{
+  "WebServerAddress": "127.0.0.1:8083",
+  "TS3Address": "127.0.0.1:10011",
+  "TS3User": "serveradmin",
+  "TS3Password": "",
+  "TS3ServerID": 1,
+  "TS3Whitelisted": "true",
+  "TS3ReferenceGroupID": "7",
+  "TS3RegisterTimer": 300,
+  "UsersValidationEndpoint": "http://127.0.0.1:8081/api/validation/ts3",
+  "PgConnString": "postgres://username:password@hostaddress/dbname?sslmode=verify-full"
+}

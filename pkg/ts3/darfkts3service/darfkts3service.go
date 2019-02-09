@@ -153,7 +153,6 @@ func (s *Service) ValidateUsers() {
 			if user.EveCharID == u.EveCharID {
 				// Invalid users should only be removed from server groups.
 				if !u.Valid {
-					fmt.Println("not calid", u)
 					s.allServerGroupsDelClient(user.TS3CLDBID)
 					s.store.SetUserInactiveByUID(user.TS3UID)
 					continue
@@ -339,9 +338,8 @@ func (s *Service) eventHandler(n client.Notification) {
 // Use this func perioducally to keep connection alive.
 func (s *Service) keepAlive() {
 	defer recoverPanic()
-	resp, err := s.client.Exec(client.Version())
-	fmt.Println("keepAlive resp")
-	fmt.Printf("%#+v", resp.Params)
+
+	_, err := s.client.Exec(client.Version())
 	system.HandleError(err, serviceName+".keepAlive")
 }
 

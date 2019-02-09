@@ -51,6 +51,7 @@ Make sure to run "eve-ts3-service init" and fill the config file before "run".`,
 
 		// Create ts3 service.
 		ts3Store := pgts3store.New(db)
+		ts3Store.Init()
 		ts3Service := darfkts3service.New(sys, ts3Store)
 		defer ts3Service.Stop()
 
