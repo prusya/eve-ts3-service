@@ -7,7 +7,9 @@ jobs:
     docker:
       # specify the version
       - image: circleci/golang:1.11
-    working_directory: /go/src/github.com/prusya/eve-ts-service
+        environment:
+          GO111MODULE: "ON"
+    working_directory: /go/src/github.com/prusya/eve-ts3-service
     steps:
       - checkout
       # specify any bash command here prefixed with `run: `
