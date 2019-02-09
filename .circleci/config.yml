@@ -7,8 +7,6 @@ jobs:
     docker:
       # specify the version
       - image: circleci/golang:1.11
-        environment:
-          GO111MODULE: "ON"
     working_directory: /go/src/github.com/prusya/eve-ts3-service
     steps:
       - checkout
