@@ -12,29 +12,29 @@ import (
 func TestNew(t *testing.T) {
 	sys := &system.System{
 		Config: &system.Config{
-			WebServerAddress: "127.0.0.1:8083",
+			WebServerAddress: ":8080",
 		},
 	}
 	httpservice := New(sys)
 	require.Equal(t, sys.HTTP, httpservice)
-	require.Equal(t, "127.0.0.1:8083", httpservice.server.Addr)
+	require.Equal(t, ":8080", httpservice.server.Addr)
 }
 
 func TestStartStop(t *testing.T) {
 	sys := &system.System{
 		Config: &system.Config{
-			WebServerAddress: "127.0.0.1:8084",
+			WebServerAddress: ":8080",
 		},
 	}
 	httpservice := New(sys)
 
 	httpservice.Start()
-	resp, err := http.Get("http://127.0.0.1:8084/api/healthcheck")
+	resp, err := http.Get("http://localhost:8080/api/healthcheck")
 	require.Nil(t, err)
 	require.Equal(t, 200, resp.StatusCode)
 	resp.Body.Close()
 
 	httpservice.Stop()
-	resp, err = http.Get("http://127.0.0.1:8084/api/healthcheck")
+	resp, err = http.Get("http://localhost:8080/api/healthcheck")
 	require.NotNil(t, err)
 }

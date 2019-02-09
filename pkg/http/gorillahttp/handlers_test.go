@@ -28,7 +28,7 @@ func TestDeserializeUser(t *testing.T) {
 func TestCreateRegisterRecord(t *testing.T) {
 	sys := &system.System{
 		Config: &system.Config{
-			WebServerAddress: "127.0.0.1:8085",
+			WebServerAddress: ":8081",
 			TS3RegisterTimer: 300,
 		},
 	}
@@ -42,7 +42,7 @@ func TestCreateRegisterRecord(t *testing.T) {
 		"corpTicker=%s;alliName=%s;alliID=%d;alliTicker=%s;",
 		"char name", 1, "corp name", 2, "corp ticker", "alli name", 3, "alli ticker")
 	data := base64.StdEncoding.EncodeToString([]byte(formatted))
-	req, _ := http.NewRequest("GET", "http://127.0.0.1:8085/api/ts3/v1/createregisterrecord", nil)
+	req, _ := http.NewRequest("GET", "http://localhost:8081/api/ts3/v1/createregisterrecord", nil)
 	req.AddCookie(&http.Cookie{
 		Name:  "char",
 		Value: data,
