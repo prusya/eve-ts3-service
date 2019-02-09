@@ -2,7 +2,6 @@ package gorillahttp
 
 import (
 	"context"
-	"log"
 	"net/http"
 	"os"
 	"time"
@@ -12,7 +11,7 @@ import (
 	"github.com/prusya/eve-ts3-service/pkg/system"
 )
 
-var (
+const (
 	serviceName = "gorillahttp"
 )
 
@@ -48,14 +47,20 @@ func New(system *system.System) *Service {
 // Start starts the Service.
 func (s *Service) Start() {
 	go func() {
+		defer s.recoverPanic()
 		err := s.server.ListenAndServe()
 		if err != nil {
 			if err != http.ErrServerClosed {
-				log.Println(err)
+				system.HandleError(err, serviceName+".Start")
 			}
-			s.system.SigChan <- os.Interrupt
 		}
 	}()
+}
+
+func (s *Service) recoverPanic() {
+	if r := recover(); r != nil {
+		s.system.SigChan <- os.Interrupt
+	}
 }
 
 // Stop stops the Service.
@@ -63,9 +68,4 @@ func (s *Service) Stop() {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	s.server.Shutdown(ctx)
-}
-
-// ServiceName return this Service's name.
-func (s *Service) ServiceName() string {
-	return "HTTP"
 }

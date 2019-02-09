@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/prusya/eve-ts3-service/pkg/system"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -57,7 +58,7 @@ func initConfig() {
 	viper.AutomaticEnv() // read in environment variables that match
 
 	// If a config file is found, read it in.
-	if err := viper.ReadInConfig(); err == nil {
-		fmt.Println("Using config file:", viper.ConfigFileUsed())
-	}
+	err := viper.ReadInConfig()
+	system.HandleError(err, "cmd.initConfig")
+	fmt.Println("Using config file:", viper.ConfigFileUsed())
 }

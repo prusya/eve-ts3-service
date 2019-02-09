@@ -4,5 +4,4 @@ package http
 type Service interface {
 	Start()
 	Stop()
-	ServiceName() string
 }

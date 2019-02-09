@@ -339,7 +339,9 @@ func (s *Service) eventHandler(n client.Notification) {
 // Use this func perioducally to keep connection alive.
 func (s *Service) keepAlive() {
 	defer recoverPanic()
-	_, err := s.client.Exec(client.Version())
+	resp, err := s.client.Exec(client.Version())
+	fmt.Println("keepAlive resp")
+	fmt.Printf("%#+v", resp.Params)
 	system.HandleError(err, serviceName+".keepAlive")
 }
 

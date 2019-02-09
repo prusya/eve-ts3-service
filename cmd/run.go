@@ -38,8 +38,7 @@ Make sure to run "eve-ts3-service init" and fill the config file before "run".`,
 		signal.Notify(sigChan, os.Interrupt, os.Kill, syscall.SIGKILL)
 
 		// Create shared System for services.
-		sys, err := system.New(sigChan)
-		system.HandleError(err)
+		sys := system.New(sigChan)
 
 		// Connect to db.
 		db, err := sqlx.Connect("postgres", sys.Config.PgConnString)

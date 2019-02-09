@@ -5,13 +5,13 @@ import (
 	"os"
 	"runtime/debug"
 
-	"github.com/pkg/errors"
 	"github.com/spf13/viper"
 
 	"github.com/prusya/eve-ts3-service/pkg/http"
 	"github.com/prusya/eve-ts3-service/pkg/ts3"
 )
 
+// System contains objects sharable across packages.
 type System struct {
 	TS3     ts3.Service
 	HTTP    http.Service
@@ -19,6 +19,7 @@ type System struct {
 	SigChan chan os.Signal
 }
 
+// Config contains all configurable options.
 type Config struct {
 	WebServerAddress string
 
@@ -35,30 +36,24 @@ type Config struct {
 	PgConnString string
 }
 
-func New(sigChan chan os.Signal) (*System, error) {
-	config, err := NewViperConfig()
-	if err != nil {
-		err = errors.WithMessage(err, "System")
-	}
-
+// New creates a new System.
+func New(sigChan chan os.Signal) *System {
+	config := NewViperConfig()
 	s := System{
 		SigChan: sigChan,
 		Config:  config,
 	}
 
-	return &s, err
+	return &s
 }
 
-func NewViperConfig() (*Config, error) {
-	var err error
+// NewViperConfig creates a new Config populated with values by viper.
+func NewViperConfig() *Config {
 	var c Config
+	err := viper.Unmarshal(&c)
+	HandleError(err, "system.NewViperConfig")
 
-	err = viper.Unmarshal(&c)
-	if err != nil {
-		err = errors.WithMessage(err, "NewViperConfig: viper.Unmarshal")
-	}
-
-	return &c, err
+	return &c
 }
 
 // HandleError logs the error and panics.

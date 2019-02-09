@@ -56,7 +56,6 @@ func respond403(w http.ResponseWriter) {
 
 // NotFoundH responds with http Not Found 404.
 func NotFoundH(w http.ResponseWriter, r *http.Request) {
-	fmt.Printf("\n%#+v\n%#+v\n", r, r.URL)
 	respondWithError(w, 404, http.StatusText(404))
 }
 
@@ -65,13 +64,14 @@ func MethodNotAllowedH(w http.ResponseWriter, r *http.Request) {
 	respondWithError(w, 405, http.StatusText(405))
 }
 
+// recoverPanic recovers and responds with http 500 in case of a panic.
 func recoverPanic(w http.ResponseWriter) {
 	if r := recover(); r != nil {
-		respondWithError(w, 500, r.(string))
+		respondWithError(w, 500, fmt.Sprintf("%s", r))
 	}
 }
 
-// CreateRegisterRecordH createa a new register record for ts3 service.
+// CreateRegisterRecordH creates a new register record for ts3 service.
 func (s *Service) CreateRegisterRecordH(w http.ResponseWriter, r *http.Request) {
 	defer recoverPanic(w)
 
