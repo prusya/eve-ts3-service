@@ -10,7 +10,7 @@ import (
 const (
 	storeName            = "pgts3store"
 	createUserTableQuery = `
-	CREATE TABLE IF NOT EXISTS "user"
+	CREATE TABLE IF NOT EXISTS "ts3_user"
 	(
 		id              SERIAL PRIMARY KEY,
 		eve_char_id     INTEGER NOT NULL,
@@ -22,15 +22,16 @@ const (
 		active          BOOLEAN
 	)`
 	createUserQuery = `
-	INSERT INTO "user"
-	(eve_char_id, eve_char_name, eve_corp_ticker, eve_alli_ticker, ts3_uid, ts3_cldbid, active)
+	INSERT INTO "ts3_user"
+	(eve_char_id, eve_char_name, eve_corp_ticker, eve_alli_ticker, 
+		ts3_uid, ts3_cldbid, active)
 	VALUES ($1, $2, $3, $4, $5, $6, $7)`
 	setUserInactiveByUIDQuery = `
-	UPDATE "user"
+	UPDATE "ts3_user"
 	SET active = 'f'
 	WHERE ts3_uid = $1`
 	updateUserQuery = `
-	UPDATE "user"
+	UPDATE "ts3_user"
 	SET eve_char_id = $1,
 		eve_char_name = $2,
 		eve_corp_ticker = $3,
@@ -74,7 +75,7 @@ func (s *Store) CreateUser(u *ts3.User) {
 // Users returns all ts3.User records.
 func (s *Store) Users() []*ts3.User {
 	var users []*ts3.User
-	err := s.db.Select(&users, `SELECT * FROM "user"`)
+	err := s.db.Select(&users, `SELECT * FROM "ts3_user"`)
 	system.HandleError(err, storeName+".Users")
 
 	return users
@@ -83,7 +84,7 @@ func (s *Store) Users() []*ts3.User {
 // ActiveUsersCharIDs returns EveCharIDs of users with `Active` set to true.
 func (s *Store) ActiveUsersCharIDs() []int32 {
 	var ids []int32
-	err := s.db.Select(&ids, `SELECT eve_char_id FROM "user" WHERE active`)
+	err := s.db.Select(&ids, `SELECT eve_char_id FROM "ts3_user" WHERE active`)
 	system.HandleError(err, storeName+".ActiveUsersCharIDs")
 
 	return ids
@@ -93,7 +94,7 @@ func (s *Store) ActiveUsersCharIDs() []int32 {
 func (s *Store) TS3UIDExists(uid string) bool {
 	var exists bool
 	err := s.db.Get(&exists,
-		`SELECT EXISTS(SELECT 1 FROM "user" WHERE ts3_uid=$1)`, uid)
+		`SELECT EXISTS(SELECT 1 FROM "ts3_user" WHERE ts3_uid=$1)`, uid)
 	system.HandleError(err, storeName+".TS3UIDExists", "uid="+uid)
 
 	return exists

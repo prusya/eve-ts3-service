@@ -82,15 +82,15 @@ func (s *Service) CreateRegisterRecordH(w http.ResponseWriter, r *http.Request) 
 
 	cookie, err := r.Cookie("char")
 	system.HandleError(err, serviceName+".CreateRegisterRecordHandler")
-	user := deserializeUser(cookie.Value)
+	user := deserializeEveUser(cookie.Value)
 	s.system.TS3.CreateRegisterRecord(user)
 
 	respondWithJSON(w, 200, s.system.Config.TS3RegisterTimer)
 }
 
-func deserializeUser(data string) *ts3.User {
+func deserializeEveUser(data string) *ts3.User {
 	bytes, err := base64.StdEncoding.DecodeString(data)
-	system.HandleError(err, serviceName+".deserializeUser", "data="+data)
+	system.HandleError(err, serviceName+".deserializeEveUser", "data="+data)
 	decoded := string(bytes)
 
 	user := ts3.User{
@@ -100,7 +100,7 @@ func deserializeUser(data string) *ts3.User {
 	}
 	charIDstr := reCharID.ReplaceAllString(decoded, "$1")
 	charID64, err := strconv.ParseInt(charIDstr, 10, 32)
-	system.HandleError(err, serviceName+".deserializeUser", "data="+data)
+	system.HandleError(err, serviceName+".deserializeEveUser", "data="+data)
 	user.EveCharID = int32(charID64)
 
 	return &user

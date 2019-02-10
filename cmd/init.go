@@ -36,6 +36,7 @@ Make sure to fill the config with proper values.`,
 			PgConnString: "postgres://username:password@hostaddress/dbname?sslmode=verify-full",
 		}
 
+		// Create config.json file.
 		cj, _ := json.MarshalIndent(c, "", "  ")
 		err := ioutil.WriteFile("config.json", cj, 0644)
 		if err != nil {
@@ -48,7 +49,10 @@ Make sure to fill the config with proper values.`,
 		fmt.Println("Config file created at", cwd)
 
 		// Create logs dir.
-		os.Mkdir("logs", 0644)
+		err = os.Mkdir("logs", 0644)
+		if err != nil {
+			panic(err)
+		}
 	},
 }
 

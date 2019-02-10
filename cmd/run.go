@@ -22,9 +22,12 @@ var runpgCmd = &cobra.Command{
 	Use:   "run",
 	Short: "starts the service",
 	Long: `usage: eve-ts3-service run
-It  will start the main functionality of the service.
+It will start the main functionality of the service.
 Make sure to run "eve-ts3-service init" and fill the config file before "run".`,
 	Run: func(cmd *cobra.Command, args []string) {
+		// Moved from root cmd cos we need to read config on demand, not always.
+		initConfig()
+
 		// Setup logger.
 		date := time.Now().Format("2006-01-02_15-04-05")
 		f, err := os.OpenFile("logs/log_"+date+".txt", os.O_WRONLY|os.O_CREATE, 0644)

@@ -18,7 +18,7 @@ func TestDeserializeUser(t *testing.T) {
 		"corpTicker=%s;alliName=%s;alliID=%d;alliTicker=%s;",
 		"char name", 1, "corp name", 2, "corp ticker", "alli name", 3, "alli ticker")
 	data := base64.StdEncoding.EncodeToString([]byte(formatted))
-	user := deserializeUser(data)
+	user := deserializeEveUser(data)
 	require.Equal(t, "char name", user.EveCharName)
 	require.Equal(t, "corp ticker", user.EveCorpTicker)
 	require.Equal(t, "alli ticker", user.EveAlliTicker)

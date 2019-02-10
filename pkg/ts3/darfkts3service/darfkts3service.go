@@ -21,14 +21,12 @@ const (
 
 // Service implements ts3.Service interface backed by darfk/ts3 lib.
 type Service struct {
-	system      *system.System
-	client      *client.Client
-	store       ts3.Store
-	registerQ   map[string]registerRecord
-	lock        sync.RWMutex
-	keepAliveT  *time.Ticker
-	rqCleanupT  *time.Ticker
-	validationT *time.Ticker
+	system    *system.System
+	client    *client.Client
+	store     ts3.Store
+	registerQ map[string]registerRecord
+	lock      sync.RWMutex
+	stopChan  chan struct{}
 }
 
 // userData defines a response from users validation server.
@@ -50,6 +48,7 @@ func New(system *system.System, store ts3.Store) *Service {
 		system:    system,
 		store:     store,
 		registerQ: make(map[string]registerRecord),
+		stopChan:  make(chan struct{}, 1),
 	}
 
 	s.system.TS3 = &s
@@ -82,31 +81,29 @@ func (s *Service) Start() {
 	s.client = c
 	s.client.NotifyHandler(s.eventHandler)
 
-	s.validationT = time.NewTicker(1 * time.Minute)
+	keepAliveT := time.NewTicker(60 * time.Second)
+	rqCleanupT := time.NewTicker(300 * time.Second)
+	validateUsersT := time.NewTicker(20 * time.Minute)
 	go func() {
-		for range s.validationT.C {
-			s.ValidateUsers()
-		}
-	}()
-	s.rqCleanupT = time.NewTicker(300 * time.Second)
-	go func() {
-		for range s.rqCleanupT.C {
-			s.registerQCleanup()
-		}
-	}()
-	s.keepAliveT = time.NewTicker(60 * time.Second)
-	go func() {
-		for range s.keepAliveT.C {
-			s.keepAlive()
+		select {
+		case <-keepAliveT.C:
+			go s.keepAlive()
+		case <-rqCleanupT.C:
+			go s.registerQCleanup()
+		case <-validateUsersT.C:
+			go s.ValidateUsers()
+		case <-s.stopChan:
+			keepAliveT.Stop()
+			rqCleanupT.Stop()
+			validateUsersT.Stop()
+			break
 		}
 	}()
 }
 
 // Stop stops the Service.
 func (s *Service) Stop() {
-	s.keepAliveT.Stop()
-	s.rqCleanupT.Stop()
-	s.validationT.Stop()
+	s.stopChan <- struct{}{}
 	if s.client != nil {
 		s.client.ExecString("quit")
 		s.client.Close()
