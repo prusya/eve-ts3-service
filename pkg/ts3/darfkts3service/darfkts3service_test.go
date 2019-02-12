@@ -25,6 +25,11 @@ func TestDarfkts3service(t *testing.T) {
 		require.Equal(t, ts3service, sys.TS3)
 	})
 
+	t.Run("TestGetStore", func(t *testing.T) {
+		ts3service := New(sys, store)
+		require.Equal(t, store, ts3service.GetStore())
+	})
+
 	t.Run("TestCreateRegisterRecord", func(t *testing.T) {
 		ts3service := New(sys, store)
 		user := &ts3.User{

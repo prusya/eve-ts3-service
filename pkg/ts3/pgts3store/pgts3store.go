@@ -40,6 +40,15 @@ const (
 		ts3_cldbid = $6,
 		active = $7
 	WHERE id = $8`
+	updateUserByUIDQuery = `
+	UPDATE "ts3_user"
+	SET eve_char_id = $1,
+		eve_char_name = $2,
+		eve_corp_ticker = $3,
+		eve_alli_ticker = $4,
+		ts3_cldbid = $5,
+		active = $6
+	WHERE ts3_uid = $7`
 )
 
 // Store implements ts3.Store interface backed by postgresql and sqlx.
@@ -104,6 +113,13 @@ func (s *Store) TS3UIDExists(uid string) bool {
 func (s *Store) UpdateUser(u *ts3.User) {
 	_, err := s.db.Exec(updateUserQuery, u.EveCharID, u.EveCharName,
 		u.EveCorpTicker, u.EveAlliTicker, u.TS3UID, u.TS3CLDBID, u.Active, u.ID)
+	system.HandleError(err, storeName+".UpdateUser", u)
+}
+
+// UpdateUserByUID updates a ts3.User record.
+func (s *Store) UpdateUserByUID(u *ts3.User) {
+	_, err := s.db.Exec(updateUserByUIDQuery, u.EveCharID, u.EveCharName,
+		u.EveCorpTicker, u.EveAlliTicker, u.TS3CLDBID, u.Active, u.TS3UID)
 	system.HandleError(err, storeName+".UpdateUser", u)
 }
 

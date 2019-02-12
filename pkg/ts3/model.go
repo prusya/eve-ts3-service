@@ -23,6 +23,7 @@ type Store interface {
 	Users() []*User
 	ActiveUsersCharIDs() []int32
 	UpdateUser(u *User)
+	UpdateUserByUID(u *User)
 	SetUserInactiveByUID(uid string)
 	TS3UIDExists(uid string) bool
 }

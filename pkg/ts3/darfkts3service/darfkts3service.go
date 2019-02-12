@@ -218,6 +218,7 @@ func (s *Service) serverGroupDelClient(sgid, cldbid string) {
 		"sgid="+sgid, "cldbid="+cldbid)
 }
 
+// serverGroupAddClient adds user to a server group.
 func (s *Service) serverGroupAddClient(sgid, cldbid string) {
 	_, err := s.client.Exec(client.Command{
 		Command: "servergroupaddclient",
@@ -253,6 +254,7 @@ func (s *Service) serverGroupCopy(groupName string) string {
 	return sgid
 }
 
+// serverGroupByName returns whether server group exists and its sgid.
 func (s *Service) serverGroupByName(groupName string) (bool, string) {
 	resp, err := s.client.Exec(client.Command{
 		Command: "servergrouplist",
@@ -307,13 +309,6 @@ func (s *Service) eventHandler(n client.Notification) {
 		return
 	}
 
-	// Do nothing if a user with uid already exists. It is because the user
-	// already been through registration process.
-	exists := s.store.TS3UIDExists(cluid)
-	if exists {
-		return
-	}
-
 	// Add user to the proper group.
 	groupName := fmt.Sprintf("%s %s", record.user.EveAlliTicker,
 		record.user.EveCorpTicker)
@@ -328,7 +323,11 @@ func (s *Service) eventHandler(n client.Notification) {
 	record.user.TS3CLDBID = cldbid
 	record.user.TS3UID = cluid
 	record.user.Active = true
-	s.store.CreateUser(record.user)
+	if s.store.TS3UIDExists(cluid) {
+		s.store.UpdateUserByUID(record.user)
+	} else {
+		s.store.CreateUser(record.user)
+	}
 }
 
 // keepAlive is actually a `version` command.

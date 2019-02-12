@@ -1,27 +1,27 @@
 package gorillahttp
 
 import (
+	"bytes"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"regexp"
-	"strconv"
 
 	"github.com/prusya/eve-ts3-service/pkg/system"
 	"github.com/prusya/eve-ts3-service/pkg/ts3"
 )
 
-var (
-	reCharID     = regexp.MustCompile(".*?charID=([^;]+);.*|.*")
-	reCorpID     = regexp.MustCompile(".*?corpID=([^;]+);.*|.*")
-	reAlliID     = regexp.MustCompile(".*?alliID=([^;]+);.*|.*")
-	reCharName   = regexp.MustCompile(".*?charName=([^;]+);.*|.*")
-	reCorpName   = regexp.MustCompile(".*?corpName=([^;]+);.*|.*")
-	reAlliName   = regexp.MustCompile(".*?alliName=([^;]+);.*|.*")
-	reCorpTicker = regexp.MustCompile(".*?corpTicker=([^;]+);.*|.*")
-	reAlliTicker = regexp.MustCompile(".*?alliTicker=([^;]+);.*|.*")
-)
+type eveChar struct {
+	EveCharID     int32
+	EveCorpID     int32
+	EveAlliID     int32
+	EveCharName   string
+	EveCorpName   string
+	EveAlliName   string
+	EveCorpTicker string
+	EveAlliTicker string
+	Valid         bool
+}
 
 // respondWithJSON receives a payload of any type, converts it into json
 // and writes resulting json to a response writer.
@@ -82,26 +82,31 @@ func (s *Service) CreateRegisterRecordH(w http.ResponseWriter, r *http.Request) 
 
 	cookie, err := r.Cookie("char")
 	system.HandleError(err, serviceName+".CreateRegisterRecordHandler")
-	user := deserializeEveUser(cookie.Value)
-	s.system.TS3.CreateRegisterRecord(user)
+	eu := deserializeEveChar(cookie.Value)
+	user := ts3.User{
+		EveCharID:     eu.EveCharID,
+		EveCharName:   eu.EveCharName,
+		EveCorpTicker: eu.EveCorpTicker,
+		EveAlliTicker: eu.EveAlliTicker,
+		Active:        true,
+	}
+	s.system.TS3.CreateRegisterRecord(&user)
 
 	respondWithJSON(w, 200, s.system.Config.TS3RegisterTimer)
 }
 
-func deserializeEveUser(data string) *ts3.User {
-	bytes, err := base64.StdEncoding.DecodeString(data)
-	system.HandleError(err, serviceName+".deserializeEveUser", "data="+data)
-	decoded := string(bytes)
+// deserializeEveChar converts base64 encoded json with eve char data into struct.
+func deserializeEveChar(data string) *eveChar {
+	// Decode base64 into json.
+	j, err := base64.StdEncoding.DecodeString(data)
+	system.HandleError(err, serviceName+".deserializeUser DecodeString", "data="+data)
 
-	user := ts3.User{
-		EveCharName:   reCharName.ReplaceAllString(decoded, "$1"),
-		EveCorpTicker: reCorpTicker.ReplaceAllString(decoded, "$1"),
-		EveAlliTicker: reAlliTicker.ReplaceAllString(decoded, "$1"),
-	}
-	charIDstr := reCharID.ReplaceAllString(decoded, "$1")
-	charID64, err := strconv.ParseInt(charIDstr, 10, 32)
-	system.HandleError(err, serviceName+".deserializeEveUser", "data="+data)
-	user.EveCharID = int32(charID64)
+	// Decode json into struct.
+	var ec eveChar
+	d := json.NewDecoder(bytes.NewReader(j))
+	d.UseNumber()
+	err = d.Decode(&ec)
+	system.HandleError(err, serviceName+".deserializeEveChar Decode", "data="+data)
 
-	return &user
+	return &ec
 }

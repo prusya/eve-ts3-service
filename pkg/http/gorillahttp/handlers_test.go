@@ -2,7 +2,7 @@ package gorillahttp
 
 import (
 	"encoding/base64"
-	"fmt"
+	"encoding/json"
 	"net/http"
 	"testing"
 
@@ -13,16 +13,24 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestDeserializeUser(t *testing.T) {
-	formatted := fmt.Sprintf("charName=%s;charID=%d;corpName=%s;corpID=%d;"+
-		"corpTicker=%s;alliName=%s;alliID=%d;alliTicker=%s;",
-		"char name", 1, "corp name", 2, "corp ticker", "alli name", 3, "alli ticker")
-	data := base64.StdEncoding.EncodeToString([]byte(formatted))
-	user := deserializeEveUser(data)
-	require.Equal(t, "char name", user.EveCharName)
-	require.Equal(t, "corp ticker", user.EveCorpTicker)
-	require.Equal(t, "alli ticker", user.EveAlliTicker)
-	require.Equal(t, int32(1), user.EveCharID)
+func TestDeserializeEveChar(t *testing.T) {
+	referenceEC := eveChar{
+		EveCharID:     1,
+		EveCorpID:     2,
+		EveAlliID:     3,
+		EveCharName:   "char name",
+		EveCorpName:   "corp name",
+		EveAlliName:   "alli name",
+		EveCorpTicker: "corp ticker",
+		EveAlliTicker: "alli ticker",
+	}
+	j, err := json.Marshal(&referenceEC)
+	require.Nil(t, err)
+	data := base64.StdEncoding.EncodeToString(j)
+
+	ec := deserializeEveChar(data)
+	require.Equal(t, referenceEC.EveCharID, ec.EveCharID)
+	require.Equal(t, referenceEC.EveCharName, ec.EveCharName)
 }
 
 func TestCreateRegisterRecord(t *testing.T) {
@@ -38,10 +46,19 @@ func TestCreateRegisterRecord(t *testing.T) {
 	httpservice := New(sys)
 
 	httpservice.Start()
-	formatted := fmt.Sprintf("charName=%s;charID=%d;corpName=%s;corpID=%d;"+
-		"corpTicker=%s;alliName=%s;alliID=%d;alliTicker=%s;",
-		"char name", 1, "corp name", 2, "corp ticker", "alli name", 3, "alli ticker")
-	data := base64.StdEncoding.EncodeToString([]byte(formatted))
+	referenceEC := eveChar{
+		EveCharID:     1,
+		EveCorpID:     2,
+		EveAlliID:     3,
+		EveCharName:   "char name",
+		EveCorpName:   "corp name",
+		EveAlliName:   "alli name",
+		EveCorpTicker: "corp ticker",
+		EveAlliTicker: "alli ticker",
+	}
+	j, err := json.Marshal(&referenceEC)
+	require.Nil(t, err)
+	data := base64.StdEncoding.EncodeToString(j)
 	req, _ := http.NewRequest("GET", "http://localhost:8081/api/ts3/v1/createregisterrecord", nil)
 	req.AddCookie(&http.Cookie{
 		Name:  "char",
