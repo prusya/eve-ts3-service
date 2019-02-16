@@ -21,7 +21,7 @@ func TestHandleError(t *testing.T) {
 		require.NotNil(t, r)
 		require.EqualValues(t, fmt.Sprintf("%s", r), refError.Error())
 	}()
-	HandleError(refError)
+	HandleError(refError, "param")
 
 	// Must not reach this.
 	t.Fail()

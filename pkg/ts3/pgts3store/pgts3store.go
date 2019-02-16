@@ -120,7 +120,7 @@ func (s *Store) UpdateUser(u *ts3.User) {
 func (s *Store) UpdateUserByUID(u *ts3.User) {
 	_, err := s.db.Exec(updateUserByUIDQuery, u.EveCharID, u.EveCharName,
 		u.EveCorpTicker, u.EveAlliTicker, u.TS3CLDBID, u.Active, u.TS3UID)
-	system.HandleError(err, storeName+".UpdateUser", u)
+	system.HandleError(err, storeName+".UpdateUserByUID", u)
 }
 
 // SetUserInactiveByUID sets `active` to false for provided uid.

@@ -81,22 +81,25 @@ func (s *Service) Start() {
 	s.client = c
 	s.client.NotifyHandler(s.eventHandler)
 
-	keepAliveT := time.NewTicker(60 * time.Second)
-	rqCleanupT := time.NewTicker(300 * time.Second)
-	validateUsersT := time.NewTicker(20 * time.Minute)
+	keepAliveT := time.NewTicker(30 * time.Second)
+	rqCleanupT := time.NewTicker(40 * time.Second)
+	validateUsersT := time.NewTicker(50 * time.Second)
 	go func() {
-		select {
-		case <-keepAliveT.C:
-			go s.keepAlive()
-		case <-rqCleanupT.C:
-			go s.registerQCleanup()
-		case <-validateUsersT.C:
-			go s.ValidateUsers()
-		case <-s.stopChan:
-			keepAliveT.Stop()
-			rqCleanupT.Stop()
-			validateUsersT.Stop()
-			break
+		for {
+			select {
+			case <-keepAliveT.C:
+				go s.keepAlive()
+			case <-rqCleanupT.C:
+				go s.registerQCleanup()
+			case <-validateUsersT.C:
+				go s.ValidateUsers()
+			case <-s.stopChan:
+				fmt.Println("===STOP CHAN===")
+				keepAliveT.Stop()
+				rqCleanupT.Stop()
+				validateUsersT.Stop()
+				break
+			}
 		}
 	}()
 }
